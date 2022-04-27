@@ -13,7 +13,11 @@
 package pe.bvva.pruebatecnica.apitipocambio.repositories;
 
 import pe.bvva.pruebatecnica.apitipocambio.models.entities.TipoCambioEntity;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 /**
  * TipoCambioRepository.
@@ -21,5 +25,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Bryan Rosas Quispe.
  * @version 1.0.0, 27-04-2022
  */
+@Repository
 public interface TipoCambioRepository extends JpaRepository<TipoCambioEntity,String> {
+    @Query("select u from TipoCambioEntity u where u.monedaEntrada.id =:idMonedaEntrada and u.monedaSalida.id =:idMonedaSalida")
+    Optional<TipoCambioEntity> findByIdTipoCambio(@Param("idMonedaEntrada") String idMonedaEntrada,
+        @Param("idMonedaSalida")String idMonedaSalida);
 }
