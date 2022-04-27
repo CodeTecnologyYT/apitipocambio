@@ -17,9 +17,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.sql.Date;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -46,7 +47,6 @@ public class TipoCambioEntity {
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "ID")
     private String id;
-
     @ManyToOne
     @JoinColumn(name = "ID_MONEDAENTRADA")
     private MonedaEntity monedaEntrada;
@@ -57,6 +57,6 @@ public class TipoCambioEntity {
     private Double valor;
     @Column(name = "PERIODO", columnDefinition = "DATE", nullable = false)
     private Date periodo;
-    @Column(name = "ACTIVO", columnDefinition = "BOOLEAN", nullable = false)
-    private Boolean esActivo;
+    @Column(name = "ACTIVO", columnDefinition = "BOOLEAN")
+    private boolean esActivo;
 }
