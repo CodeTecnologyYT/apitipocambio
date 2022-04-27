@@ -26,7 +26,7 @@ public class TipoCambioConvert extends AbstractConvert<TipoCambioRequest, TipoCa
                    .idMonedaSalida(tipoCambioEntity.getMonedaSalida().getId())
                    .valor(tipoCambioEntity.getValor())
                    .periodo(tipoCambioEntity.getPeriodo())
-                   .esActivo(tipoCambioEntity.isEsActivo())
+                   .activo(tipoCambioEntity.isEsActivo())
             .build();
     }
 }
