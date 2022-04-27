@@ -17,12 +17,11 @@ import lombok.AllArgsConstructor;
 import pe.bvva.pruebatecnica.apitipocambio.exceptions.NoDataFoundException;
 import pe.bvva.pruebatecnica.apitipocambio.models.entities.MonedaEntity;
 import pe.bvva.pruebatecnica.apitipocambio.models.entities.TipoCambioEntity;
+import pe.bvva.pruebatecnica.apitipocambio.models.requests.ConversionCambioRequest;
+import pe.bvva.pruebatecnica.apitipocambio.models.responses.ConversionCambioResponse;
 import pe.bvva.pruebatecnica.apitipocambio.repositories.MonedaRepository;
 import pe.bvva.pruebatecnica.apitipocambio.repositories.TipoCambioRepository;
 import java.util.Optional;
-import java.util.concurrent.Flow;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,11 +69,41 @@ public class TipoCambioService {
             Optional<TipoCambioEntity> tipoCambioEncontrado =
                 tipoCambioRepository.findByIdTipoCambio(tipoCambioEntity.getMonedaEntrada().getId(),
                     tipoCambioEntity.getMonedaSalida().getId());
-            if(tipoCambioEncontrado.isEmpty())
+            if (tipoCambioEncontrado.isEmpty())
                 singleSubscriber.onError(new NoDataFoundException("No existe el tipo de cambio"));
             TipoCambioEntity tipocambioCreate = tipoCambioRepository.save(tipoCambioEntity);
 
             singleSubscriber.onSuccess(tipocambioCreate);
         });
     }
+
+    public Single<ConversionCambioResponse> conversionTipoDeCambio(String idOrigen, String idDestino,
+        ConversionCambioRequest conversionCambioRequest) {
+        return Single.create(singleSubscriber -> {
+            Optional<MonedaEntity> monedaEntradaEncontrada =
+                monedaRepository.findById(idOrigen);
+            Optional<MonedaEntity> monedaSalidaEncontrada =
+                monedaRepository.findById(idDestino);
+            if (monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty())
+                singleSubscriber.onError(new NoDataFoundException("No se encontro el id de la moneda"));
+            Optional<TipoCambioEntity> tipoCambioEncontrado =
+                tipoCambioRepository.findByIdTipoCambio(idOrigen,
+                    idDestino);
+            if (tipoCambioEncontrado.isEmpty())
+                singleSubscriber.onError(new NoDataFoundException("No existe el tipo de cambio"));
+            Double valorCambio = tipoCambioEncontrado.get().getValor();
+            Double montoCambio = (conversionCambioRequest.getEsDestino()) ?
+                                     conversionCambioRequest.getMonto() * valorCambio :
+                                     conversionCambioRequest.getMonto() / valorCambio;
+            singleSubscriber.onSuccess(ConversionCambioResponse.builder()
+                .montoCambio(montoCambio)
+                .tipoCambio(monedaSalidaEncontrada.get().getDescripcion())
+                .idMonedaDestino(monedaSalidaEncontrada.get().getId())
+                .idMonedaOrigen(monedaEntradaEncontrada.get().getId())
+                .flagDestino(conversionCambioRequest.getEsDestino())
+                .monto(conversionCambioRequest.getMonto())
+                .build());
+        });
+    }
+
 }

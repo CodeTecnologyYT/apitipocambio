@@ -1,5 +1,5 @@
 /*
- * @(#)TipoCambioResponse.java
+ * @(#)ConversionCambioResponse.java
  *
  * Copyright (c) BBVA (PERU). All rights reserved.
  *
@@ -17,10 +17,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.Date;
 
 /**
- * TipoCambioResponse.
+ * ConversionCambioResponse.
  *
  * @author Bryan Rosas Quispe.
  * @version 1.0.0, 27-04-2022
@@ -28,14 +27,13 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Getter
-@NoArgsConstructor
 @Setter
-public class TipoCambioResponse {
-
-    private String id;
-    private String idMonedaEntrada;
-    private String idMonedaSalida;
-    private Date periodo;
-    private Double valor;
-    private boolean activo;
+@NoArgsConstructor
+public class ConversionCambioResponse {
+    private Double monto;
+    private String idMonedaOrigen;
+    private String idMonedaDestino;
+    private Double montoCambio;
+    private String tipoCambio;
+    private Boolean flagDestino;
 }
