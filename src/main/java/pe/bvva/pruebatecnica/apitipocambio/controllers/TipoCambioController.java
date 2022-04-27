@@ -21,6 +21,7 @@ import pe.bvva.pruebatecnica.apitipocambio.services.TipoCambioService;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +48,15 @@ public class TipoCambioController {
             .map(tipoCambio ->
                 ResponseEntity.created(URI.create("/tipocambio/" + tipoCambio.getId())).body(tipoCambio)
         );
+    }
+
+    @PutMapping("/")
+    public Single<ResponseEntity> updateTipoCambio(@RequestBody TipoCambioRequest tipoCambioRequest){
+        TipoCambioEntity tipoCambioEntityConvert = tipoCambioConvert.fromRequest(tipoCambioRequest);
+        return tipoCambioService.updateTipoDeCambio(tipoCambioEntityConvert)
+            .map( tipoCambioEntity -> tipoCambioConvert.fromEntity(tipoCambioEntity))
+            .map(tipoCambio ->
+                     ResponseEntity.created(URI.create("/tipocambio/" + tipoCambio.getId())).body(tipoCambio)
+                );
     }
 }

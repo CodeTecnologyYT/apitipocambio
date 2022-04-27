@@ -50,8 +50,28 @@ public class TipoCambioService {
                 tipoCambioRepository.findByIdTipoCambio(tipoCambioEntity.getMonedaEntrada().getId(),
                     tipoCambioEntity.getMonedaSalida().getId());
             if(tipoCambioEncontrado.isPresent())
-                singleSubscriber.onError(new NoDataFoundException("Ya existe el tipo de cambio"));;
+                singleSubscriber.onError(new NoDataFoundException("Ya existe el tipo de cambio"));
+
             tipoCambioEntity.setEsActivo(true);
+            TipoCambioEntity tipocambioCreate = tipoCambioRepository.save(tipoCambioEntity);
+
+            singleSubscriber.onSuccess(tipocambioCreate);
+        });
+    }
+
+    public Single<TipoCambioEntity> updateTipoDeCambio(TipoCambioEntity tipoCambioEntity){
+        return Single.create(singleSubscriber ->{
+            Optional<MonedaEntity> monedaEntradaEncontrada =
+                monedaRepository.findById(tipoCambioEntity.getMonedaEntrada().getId());
+            Optional<MonedaEntity> monedaSalidaEncontrada =
+                monedaRepository.findById(tipoCambioEntity.getMonedaSalida().getId());
+            if(monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty())
+                singleSubscriber.onError(new NoDataFoundException("No se encontro el id de la moneda"));
+            Optional<TipoCambioEntity> tipoCambioEncontrado =
+                tipoCambioRepository.findByIdTipoCambio(tipoCambioEntity.getMonedaEntrada().getId(),
+                    tipoCambioEntity.getMonedaSalida().getId());
+            if(tipoCambioEncontrado.isEmpty())
+                singleSubscriber.onError(new NoDataFoundException("No existe el tipo de cambio"));
             TipoCambioEntity tipocambioCreate = tipoCambioRepository.save(tipoCambioEntity);
 
             singleSubscriber.onSuccess(tipocambioCreate);
