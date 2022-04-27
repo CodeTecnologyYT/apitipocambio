@@ -32,8 +32,10 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class TipoCambioRequest {
+    private String id;
     private String idMonedaEntrada;
     private String idMonedaSalida;
     private Double valor;
+    private boolean esActivo;
     private Date periodo;
 }

@@ -9,10 +9,12 @@ public class TipoCambioConvert extends AbstractConvert<TipoCambioRequest, TipoCa
     @Override
     public TipoCambioEntity fromRequest(TipoCambioRequest tipoCambioRequest) {
         return TipoCambioEntity.builder()
+            .id(tipoCambioRequest.getId())
             .monedaEntrada(MonedaEntity.builder().id(tipoCambioRequest.getIdMonedaEntrada()).build())
             .monedaSalida(MonedaEntity.builder().id(tipoCambioRequest.getIdMonedaSalida()).build())
-                   .valor(tipoCambioRequest.getValor())
-                   .periodo(tipoCambioRequest.getPeriodo())
+            .valor(tipoCambioRequest.getValor())
+            .periodo(tipoCambioRequest.getPeriodo())
+            .esActivo(tipoCambioRequest.isEsActivo())
                 .build();
     }
 
