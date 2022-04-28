@@ -9,3 +9,10 @@ Por cada tipo de cambio realizado, se debe registrar quien hizo la solicitud (au
 
 ### Diagrama de Entidad - Relacion
 ![](diagramaRelalacion.png)
+
+
+### Endpoint
+https://app.getpostman.com/join-team?invite_code=43afde2ab9a320e4cfdd18c5924ea4ae&target_code=b948021bb7ad34735331b5f2518b0d17
+
+### Diagrama de Arquitectura
+![](diagramaArquitectura.png)
