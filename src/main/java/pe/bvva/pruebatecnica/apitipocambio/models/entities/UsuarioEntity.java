@@ -1,5 +1,5 @@
 /*
- * @(#)MonedaEntity.java
+ * @(#)UsuarioEntity.java
  *
  * Copyright (c) BBVA (PERU). All rights reserved.
  *
@@ -19,9 +19,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.List;
-import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -31,35 +32,38 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
- * MonedaEntity.
+ * UsuarioEntity.
  *
  * @author Bryan Rosas Quispe.
  * @version 1.0.0, 27-04-2022
  */
-@Table(name = "TDC_MONEDA")
+@Table(name = "TDC_USUARIO")
 @Entity
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MonedaEntity {
+public class UsuarioEntity {
+
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "ID")
     private String id;
 
-    @Column(name = "DESCRIPCION", columnDefinition = "VARCHAR(250)", nullable = false)
-    private String descripcion;
+    @Column(name = "USERNAME", columnDefinition = "VARCHAR(250)", nullable = false)
+    private String username;
 
-    @OneToMany(mappedBy = "monedaEntrada")
+    @Column(name = "PASSWORD", columnDefinition = "VARCHAR(250)", nullable = false)
+    private String password;
+
+    @Column(name = "ACTIVO", columnDefinition = "BOOLEAN")
+    private Boolean activo;
+
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "usuario")
     @Fetch(FetchMode.JOIN)
     @JsonManagedReference
-    private Set<TipoCambioEntity> tipoCambioEntrada;
+    private List<UsuarioRoleEntity> usuarioRole;
 
-    @OneToMany(mappedBy = "monedaSalida")
-    @Fetch(FetchMode.JOIN)
-    @JsonManagedReference
-    private Set<TipoCambioEntity> tipoCambioSalida;
 }

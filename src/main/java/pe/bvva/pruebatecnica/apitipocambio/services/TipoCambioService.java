@@ -14,6 +14,7 @@ package pe.bvva.pruebatecnica.apitipocambio.services;
 
 import io.reactivex.rxjava3.core.Single;
 import lombok.AllArgsConstructor;
+import pe.bvva.pruebatecnica.apitipocambio.exceptions.BadRequestException;
 import pe.bvva.pruebatecnica.apitipocambio.exceptions.NoDataFoundException;
 import pe.bvva.pruebatecnica.apitipocambio.models.entities.MonedaEntity;
 import pe.bvva.pruebatecnica.apitipocambio.models.entities.TipoCambioEntity;
@@ -47,18 +48,21 @@ public class TipoCambioService {
                 monedaRepository.findById(tipoCambioEntity.getMonedaEntrada().getId());
             Optional<MonedaEntity> monedaSalidaEncontrada =
                 monedaRepository.findById(tipoCambioEntity.getMonedaSalida().getId());
-            if(monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty())
-                singleSubscriber.onError(new NoDataFoundException("No se encontro el id de la moneda"));
-            Optional<TipoCambioEntity> tipoCambioEncontrado =
-                tipoCambioRepository.findByIdTipoCambio(tipoCambioEntity.getMonedaEntrada().getId(),
-                    tipoCambioEntity.getMonedaSalida().getId());
-            if(tipoCambioEncontrado.isPresent())
-                singleSubscriber.onError(new NoDataFoundException("Ya existe el tipo de cambio"));
+            if(monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty()){
+                singleSubscriber.onError(new BadRequestException("No se encontro el id de la moneda"));
+            }else{
+                Optional<TipoCambioEntity> tipoCambioEncontrado =
+                    tipoCambioRepository.findByIdTipoCambio(tipoCambioEntity.getMonedaEntrada().getId(),
+                        tipoCambioEntity.getMonedaSalida().getId());
+                if(tipoCambioEncontrado.isPresent()){
+                    singleSubscriber.onError(new BadRequestException("Ya existe el tipo de cambio"));
+                }else{
+                    tipoCambioEntity.setEsActivo(true);
+                    TipoCambioEntity tipocambioCreate = tipoCambioRepository.save(tipoCambioEntity);
 
-            tipoCambioEntity.setEsActivo(true);
-            TipoCambioEntity tipocambioCreate = tipoCambioRepository.save(tipoCambioEntity);
-
-            singleSubscriber.onSuccess(tipocambioCreate);
+                    singleSubscriber.onSuccess(tipocambioCreate);
+                }
+            }
         });
     }
 
@@ -68,16 +72,19 @@ public class TipoCambioService {
                 monedaRepository.findById(tipoCambioEntity.getMonedaEntrada().getId());
             Optional<MonedaEntity> monedaSalidaEncontrada =
                 monedaRepository.findById(tipoCambioEntity.getMonedaSalida().getId());
-            if(monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty())
-                singleSubscriber.onError(new NoDataFoundException("No se encontro el id de la moneda"));
-            Optional<TipoCambioEntity> tipoCambioEncontrado =
-                tipoCambioRepository.findByIdTipoCambio(tipoCambioEntity.getMonedaEntrada().getId(),
-                    tipoCambioEntity.getMonedaSalida().getId());
-            if (tipoCambioEncontrado.isEmpty())
-                singleSubscriber.onError(new NoDataFoundException("No existe el tipo de cambio"));
-            TipoCambioEntity tipocambioCreate = tipoCambioRepository.save(tipoCambioEntity);
-
-            singleSubscriber.onSuccess(tipocambioCreate);
+            if(monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty()){
+                singleSubscriber.onError(new BadRequestException("No se encontro el id de la moneda"));
+            }else{
+                Optional<TipoCambioEntity> tipoCambioEncontrado =
+                    tipoCambioRepository.findByIdTipoCambio(tipoCambioEntity.getMonedaEntrada().getId(),
+                        tipoCambioEntity.getMonedaSalida().getId());
+                if (tipoCambioEncontrado.isEmpty()){
+                    singleSubscriber.onError(new BadRequestException("No existe el tipo de cambio"));
+                }else{
+                    TipoCambioEntity tipocambioCreate = tipoCambioRepository.save(tipoCambioEntity);
+                    singleSubscriber.onSuccess(tipocambioCreate);
+                }
+            }
         });
     }
 
@@ -88,25 +95,29 @@ public class TipoCambioService {
                 monedaRepository.findById(idOrigen);
             Optional<MonedaEntity> monedaSalidaEncontrada =
                 monedaRepository.findById(idDestino);
-            if (monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty())
-                singleSubscriber.onError(new NoDataFoundException("No se encontro el id de la moneda"));
-            Optional<TipoCambioEntity> tipoCambioEncontrado =
-                tipoCambioRepository.findByIdTipoCambio(idOrigen,
-                    idDestino);
-            if (tipoCambioEncontrado.isEmpty())
-                singleSubscriber.onError(new NoDataFoundException("No existe el tipo de cambio"));
-            Double valorCambio = tipoCambioEncontrado.get().getValor();
-            Double montoCambio = (conversionCambioRequest.getEsDestino()) ?
-                                     conversionCambioRequest.getMonto() * valorCambio :
-                                     conversionCambioRequest.getMonto() / valorCambio;
-            singleSubscriber.onSuccess(ConversionCambioResponse.builder()
-                .montoCambio(montoCambio)
-                .tipoCambio(monedaSalidaEncontrada.get().getDescripcion())
-                .idMonedaDestino(monedaSalidaEncontrada.get().getId())
-                .idMonedaOrigen(monedaEntradaEncontrada.get().getId())
-                .flagDestino(conversionCambioRequest.getEsDestino())
-                .monto(conversionCambioRequest.getMonto())
-                .build());
+            if (monedaEntradaEncontrada.isEmpty() || monedaSalidaEncontrada.isEmpty()){
+                singleSubscriber.onError(new BadRequestException("No se encontro el id de la moneda"));
+            }else{
+                Optional<TipoCambioEntity> tipoCambioEncontrado =
+                    tipoCambioRepository.findByIdTipoCambio(idOrigen,
+                        idDestino);
+                if (tipoCambioEncontrado.isEmpty()){
+                    singleSubscriber.onError(new BadRequestException("No existe el tipo de cambio"));
+                } else{
+                    Double valorCambio = tipoCambioEncontrado.get().getValor();
+                    Double montoCambio = (conversionCambioRequest.getEsDestino()) ?
+                                             conversionCambioRequest.getMonto() * valorCambio :
+                                             conversionCambioRequest.getMonto() / valorCambio;
+                    singleSubscriber.onSuccess(ConversionCambioResponse.builder()
+                        .montoCambio(montoCambio)
+                        .tipoCambio(monedaSalidaEncontrada.get().getDescripcion())
+                        .idMonedaDestino(monedaSalidaEncontrada.get().getId())
+                        .idMonedaOrigen(monedaEntradaEncontrada.get().getId())
+                        .flagDestino(conversionCambioRequest.getEsDestino())
+                        .monto(conversionCambioRequest.getMonto())
+                        .build());
+                }
+            }
         });
     }
 
