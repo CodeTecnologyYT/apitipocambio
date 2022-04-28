@@ -17,6 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,9 +51,11 @@ public class TipoCambioEntity {
     private String id;
     @ManyToOne
     @JoinColumn(name = "ID_MONEDAENTRADA")
+    @JsonIgnoreProperties({"tipoCambioSalida","tipoCambioEntrada"})
     private MonedaEntity monedaEntrada;
     @ManyToOne
     @JoinColumn(name = "ID_MONEDASALIDA")
+    @JsonIgnoreProperties({"tipoCambioSalida","tipoCambioEntrada"})
     private MonedaEntity monedaSalida;
     @Column(name = "VALOR", columnDefinition = "NUMERIC", nullable = false)
     private Double valor;

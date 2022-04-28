@@ -21,6 +21,7 @@ import pe.bvva.pruebatecnica.apitipocambio.models.requests.TipoCambioRequest;
 import pe.bvva.pruebatecnica.apitipocambio.services.TipoCambioService;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,7 +44,7 @@ public class TipoCambioController {
     private final TipoCambioService tipoCambioService;
     private final TipoCambioConvert tipoCambioConvert;
 
-    @PostMapping("/")
+    @PostMapping("")
     public Single<ResponseEntity> createTipoCambio(@RequestBody TipoCambioRequest tipoCambioRequest){
         TipoCambioEntity tipoCambioEntityConvert = tipoCambioConvert.fromRequest(tipoCambioRequest);
         return tipoCambioService.createTipoDeCambio(tipoCambioEntityConvert)
@@ -53,7 +54,7 @@ public class TipoCambioController {
         );
     }
 
-    @PutMapping("/")
+    @PutMapping("")
     public Single<ResponseEntity> updateTipoCambio(@RequestBody TipoCambioRequest tipoCambioRequest){
         TipoCambioEntity tipoCambioEntityConvert = tipoCambioConvert.fromRequest(tipoCambioRequest);
         return tipoCambioService.updateTipoDeCambio(tipoCambioEntityConvert)
@@ -66,10 +67,23 @@ public class TipoCambioController {
     @PostMapping("/{idMonedaOrigen}/{idMonedaDestino}")
     public Single<ResponseEntity> conversionTipoCambio(@PathVariable("idMonedaOrigen") String idOrigen,
         @PathVariable("idMonedaDestino") String idDestino,
-        @RequestBody ConversionCambioRequest tipoCambioRequest){
-        return tipoCambioService.conversionTipoDeCambio(idOrigen,idDestino,tipoCambioRequest)
+        @RequestBody ConversionCambioRequest tipoCambioRequest) {
+        return tipoCambioService.conversionTipoDeCambio(idOrigen, idDestino, tipoCambioRequest)
             .map(conversionCambioResponse ->
                      ResponseEntity.ok().body(conversionCambioResponse)
                 );
     }
+
+    @GetMapping("")
+    public Single<ResponseEntity> getAllTipoCambio(
+        @RequestParam(name = "descripcionOrigen",required = false) String descripcionOrigen,
+        @RequestParam(name = "descripcionDestino",required = false) String descripcionDestino,
+        @RequestParam(name = "page") Integer page,
+        @RequestParam(name = "pageSize") Integer pageSize) {
+        return tipoCambioService.findTipoDeCambio(descripcionOrigen, descripcionDestino, page, pageSize)
+            .map(conversionCambioResponse ->
+                     ResponseEntity.ok().body(conversionCambioResponse)
+                );
+    }
+
 }
