@@ -19,9 +19,13 @@ import pe.bvva.pruebatecnica.apitipocambio.models.entities.MonedaEntity;
 import pe.bvva.pruebatecnica.apitipocambio.models.entities.TipoCambioEntity;
 import pe.bvva.pruebatecnica.apitipocambio.models.requests.ConversionCambioRequest;
 import pe.bvva.pruebatecnica.apitipocambio.models.responses.ConversionCambioResponse;
+import pe.bvva.pruebatecnica.apitipocambio.models.responses.TipoCambioResponse;
 import pe.bvva.pruebatecnica.apitipocambio.repositories.MonedaRepository;
 import pe.bvva.pruebatecnica.apitipocambio.repositories.TipoCambioRepository;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -103,6 +107,16 @@ public class TipoCambioService {
                 .flagDestino(conversionCambioRequest.getEsDestino())
                 .monto(conversionCambioRequest.getMonto())
                 .build());
+        });
+    }
+
+    public Single<Page<TipoCambioEntity>> findTipoDeCambio(String descripcionOrigen,
+        String descripcionDestino, Integer page, Integer size) {
+        return Single.create(singleSubscriber -> {
+            Pageable paging = PageRequest.of(page, size);
+            Page<TipoCambioEntity> tipoCambio = tipoCambioRepository.filterTipoCambio(descripcionOrigen,
+                descripcionDestino, paging);
+            singleSubscriber.onSuccess(tipoCambio);
         });
     }
 
