@@ -21,6 +21,8 @@ import pe.bvva.pruebatecnica.apitipocambio.models.requests.TipoCambioRequest;
 import pe.bvva.pruebatecnica.apitipocambio.services.TipoCambioService;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +47,7 @@ public class TipoCambioController {
     private final TipoCambioConvert tipoCambioConvert;
 
     @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Single<ResponseEntity> createTipoCambio(@RequestBody TipoCambioRequest tipoCambioRequest){
         TipoCambioEntity tipoCambioEntityConvert = tipoCambioConvert.fromRequest(tipoCambioRequest);
         return tipoCambioService.createTipoDeCambio(tipoCambioEntityConvert)
@@ -55,6 +58,7 @@ public class TipoCambioController {
     }
 
     @PutMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Single<ResponseEntity> updateTipoCambio(@RequestBody TipoCambioRequest tipoCambioRequest){
         TipoCambioEntity tipoCambioEntityConvert = tipoCambioConvert.fromRequest(tipoCambioRequest);
         return tipoCambioService.updateTipoDeCambio(tipoCambioEntityConvert)
@@ -65,6 +69,7 @@ public class TipoCambioController {
     }
 
     @PostMapping("/{idMonedaOrigen}/{idMonedaDestino}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USUARIO')")
     public Single<ResponseEntity> conversionTipoCambio(@PathVariable("idMonedaOrigen") String idOrigen,
         @PathVariable("idMonedaDestino") String idDestino,
         @RequestBody ConversionCambioRequest tipoCambioRequest) {
@@ -75,6 +80,7 @@ public class TipoCambioController {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Single<ResponseEntity> getAllTipoCambio(
         @RequestParam(name = "descripcionOrigen",required = false) String descripcionOrigen,
         @RequestParam(name = "descripcionDestino",required = false) String descripcionDestino,
